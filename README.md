@@ -22,3 +22,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 
 
 ## 初始化项目 配置eslint 自动修复的功能
+
+## 循环显示所有路由
+
+## 创建第一个openlayers的vue文件
