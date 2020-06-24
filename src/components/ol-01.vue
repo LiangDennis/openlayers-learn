@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h2>{{title}}</h2>
-    <input type="number" v-model="distance">
+    <input type="number" v-model="distance" style="margin: 0 0 10px;"> <button @click="createMap()">重新渲染地图</button>
     <div class="map" id="map"></div>
   </div>
 </template>
@@ -12,7 +12,7 @@ import ol from 'openlayers'
 export default {
   data () {
     return {
-      title: 'openlayers',
+      title: 'openlayers 聚合features',
       distance: 10,
       styleCache: {},
       map: null
@@ -85,6 +85,15 @@ export default {
     },
     // 创建地图
     createMap () {
+      if (this.map) {
+        // 1. 想删除原来的地图图层创建新的，这样的需求
+        // console.log(this.map.getLayers().a)
+        // this.map.removeLayer(this.map.getLayers().a[0])
+        // this.map.removeLayer(this.map.getLayers().a[0])
+        // 2. 现在的想法是将以前的feature删除，添加新的feature
+        console.log(this.map.getFeatures())
+      }
+
       let clusters = this.createClusterData()
 
       let raster = new ol.layer.Tile({
@@ -101,19 +110,6 @@ export default {
           zoom: 2
         })
       })
-      // let raster = new ol.layer.Tile({
-      //   source: new ol.source.OSM()
-      // })
-
-      // this.map = new ol.Map({
-      //   layers: [raster],
-      //   target: 'map',
-      //   view: new ol.View({
-      //     center: [121.3028308866, 31.0164689898],
-      //     projection: 'EPSG:4326', // 在view层使用这个，可以将地图中0，0的位置方式换成是地图坐标的方式
-      //     zoom: 10
-      //   })
-      // })
     },
     onlyOneMethodToCreateMap () {
       let count = 20
@@ -132,8 +128,6 @@ export default {
         distance: parseInt(this.distance, 10),
         source: source
       })
-
-      // console.log(clusterSource.getSource().getFeatures())
 
       let styleCache = {}
       let clusters = new ol.layer.Vector({
@@ -184,10 +178,3 @@ export default {
   }
 }
 </script>
-
-<style scoped >
-.map{
-  width: 100%;
-  height: 400px;
-}
-</style>

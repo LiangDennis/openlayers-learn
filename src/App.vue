@@ -60,4 +60,10 @@ export default {
   display: none;
 }
 
+/* 全局设置 container  */
+.container .map{
+  width: 100%;
+  height: 400px;
+}
+
 </style>
