@@ -2,12 +2,14 @@
   <div class="container">
     <h2>{{title}}</h2>
     <div id="map" class="map"></div>
-    <select id="type" v-model="selectType" @change="handleTypeChange">
+      <select id="type" v-model="selectType" @change="handleTypeChange">
         <option value="Point">Point</option>
         <option value="LineString">LineString</option>
         <option value="Polygon">Polygon</option>
         <option value="Circle">Circle</option>
       </select>
+      <button @click="createDrawSnap">open draw</button>
+      <button @click="removeLayerMethod">remove layer</button>
   </div>
 </template>
 
@@ -21,7 +23,8 @@ export default {
       map: null,
       draw: null,
       snap: null,
-      selectType: 'Point'
+      selectType: 'Point',
+      vectorLayer: null
     }
   },
   mounted () {
@@ -29,6 +32,10 @@ export default {
     this.map.on('click', (e) => {
       // console.log('地图被点击了')
       // console.log(e)
+      if (this.draw && this.selectType === 'Point') {
+        this.map.removeInteraction(this.draw)
+        this.map.removeInteraction(this.snap)
+      }
       this.map.forEachFeatureAtPixel(e.pixel, (feature) => {
         console.log(feature.getGeometry().A)
       })
@@ -39,6 +46,10 @@ export default {
   },
   methods: {
     handleTypeChange () {
+      if (!this.vectorLayer) {
+        this.vectorLayer = this.createLayer()
+        this.map.addLayer(this.vectorLayer)
+      }
       this.map.removeInteraction(this.draw) // 移除旧的draw和snap
       this.map.removeInteraction(this.snap)
       this.createDrawSnap() // 创建新的draw和snap
@@ -60,10 +71,10 @@ export default {
       })
 
       this.createSource()
-      let vector = this.createLayer()
+      this.vectorLayer = this.createLayer()
 
       this.map = new ol.Map({
-        layers: [raster, vector],
+        layers: [raster, this.vectorLayer],
         target: 'map',
         view: new ol.View({
           center: [121.3028308866, 31.0164689898],
@@ -131,6 +142,13 @@ export default {
       this.map.addInteraction(this.draw)
       this.snap = new ol.interaction.Snap({source: that.source}) // 鼠标的自动吸附
       this.map.addInteraction(this.snap)
+    },
+    removeLayerMethod () {
+      // this.vectorLayer && this.map.removeLayer(this.vectorLayer)
+      if (this.vectorLayer) {
+        this.map.removeLayer(this.vectorLayer)
+        this.vectorLayer = null
+      }
     }
   }
 }
