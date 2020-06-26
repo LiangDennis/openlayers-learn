@@ -29,43 +29,28 @@ export default {
   },
   mounted () {
     this.createMap()
+    // 监听地图点击事件
     this.map.on('click', (e) => {
-      // console.log('地图被点击了')
-      // console.log(e)
       if (this.draw && this.selectType === 'Point') { // 防止画线、多边形、圆形的时候点击一次就消失
-        this.map.removeInteraction(this.draw)
-        this.map.removeInteraction(this.snap)
+        this.removeDrawSnap()
       }
+      // 通过forEachFeatureAtPixel 的方法，获取点击位置的feature
       this.map.forEachFeatureAtPixel(e.pixel, (feature) => {
-        console.log(feature.getGeometry().A)
+        console.log(feature.getGeometry().A) // 获取feature坐标，有没有更好的方式呢？
       })
-      // this.map.forEachLayerAtPixel(e.pixel, (layer) => {
-      //   console.log(layer)
-      // })
     })
   },
   methods: {
+    // 改变 feature 类型
     handleTypeChange () {
       if (!this.vectorLayer) {
-        this.vectorLayer = this.createLayer() // 当创建的时候还是同一个source
-        this.map.addLayer(this.vectorLayer)
+        this.resetLayer()
         this.createDrawSnap()
       }
-      this.map.removeInteraction(this.draw) // 移除旧的draw和snap
-      this.map.removeInteraction(this.snap)
+      this.removeDrawSnap()
       this.createDrawSnap() // 创建新的draw和snap
-      // console.log(this.snap.getMap().getLayers()) // 多个layer
-      // 这个获取到的是Vector对象，同时draw和snap所使用的source都是这个，所以可以获取到features
-      // console.log(this.snap.getMap().getLayers().a[1].getSource().getFeatures()) // features数组
-      // 获取到的Layer是Tile对象，其source是OSM对象，并不能获取feature
-      // console.log(this.draw.getMap().getLayers().a[0].getSource())
-      // let features = this.snap.getMap().getLayers().a[1].getSource().getFeatures()
-      // features.forEach(v => {
-      //   console.log(v.N)
-      //   console.log(v.getGeometry().A)
-      //   console.log(v.getGeometry().getProperties())
-      // })
     },
+    // 创建地图
     createMap () {
       let raster = new ol.layer.Tile({
         source: new ol.source.OSM()
@@ -84,12 +69,13 @@ export default {
           zoom: 10
         })
       })
-      // this.createModify()
       this.createDrawSnap()
     },
+    // 创建source
     createSource () {
       this.source = new ol.source.Vector()
     },
+    // 创建layer vector
     createLayer () {
       let source = this.source
       let vector = new ol.layer.Vector({
@@ -113,15 +99,21 @@ export default {
       })
       return vector
     },
+    // 重新设置layer vector
+    resetLayer () {
+      this.vectorLayer = this.createLayer() // 当创建的时候还是同一个source
+      this.map.addLayer(this.vectorLayer)
+    },
+    // 地图交互 图形的拓展
     createModify () {
       let source = this.source
       let modify = new ol.interaction.Modify({source: source}) // 设置线条可以再次被设置
       this.map.addInteraction(modify)
     },
+    // 地图交互 draw 绘制各种图形 snap 鼠标吸附
     createDrawSnap () {
       if (!this.vectorLayer) {
-        this.vectorLayer = this.createLayer()
-        this.map.addLayer(this.vectorLayer)
+        this.resetLayer()
       }
       let that = this
       this.draw = new ol.interaction.Draw({
@@ -129,9 +121,6 @@ export default {
         type: that.selectType,
         // 设置draw的时候使用的样式
         style: new ol.style.Style({
-          // fill: new ol.style.Fill({
-          //   color: '#ff0000'
-          // }),
           stroke: new ol.style.Stroke({ // 设置draw时的线条或者点的颜色
             color: '#0000ff',
             width: 10
@@ -148,13 +137,15 @@ export default {
       this.snap = new ol.interaction.Snap({source: that.source}) // 鼠标的自动吸附
       this.map.addInteraction(this.snap)
     },
-    // 清除图层
+    // 清除draw 和 snap 以便生成新的draw 和 snap
+    removeDrawSnap () {
+      this.map.removeInteraction(this.draw)
+      this.map.removeInteraction(this.snap)
+    },
+    // 清除 layer 图层 以及 清除数据
     removeLayerMethod () {
-      // this.vectorLayer && this.map.removeLayer(this.vectorLayer)
       if (this.vectorLayer) {
-        // this.vectorLayer.clear() // 清除所有的feature
-        this.map.removeInteraction(this.draw)
-        this.map.removeInteraction(this.snap)
+        this.removeDrawSnap()
         this.source.clear() // 清除所有的feature
         this.map.removeLayer(this.vectorLayer)
         this.vectorLayer = null
@@ -162,6 +153,18 @@ export default {
     }
   }
 }
+
+// console.log(this.snap.getMap().getLayers()) // 多个layer
+// 这个获取到的是Vector对象，同时draw和snap所使用的source都是这个，所以可以获取到features
+// console.log(this.snap.getMap().getLayers().a[1].getSource().getFeatures()) // features数组
+// 获取到的Layer是Tile对象，其source是OSM对象，并不能获取feature
+// console.log(this.draw.getMap().getLayers().a[0].getSource())
+// let features = this.snap.getMap().getLayers().a[1].getSource().getFeatures()
+// features.forEach(v => {
+//   console.log(v.N)
+//   console.log(v.getGeometry().A)
+//   console.log(v.getGeometry().getProperties())
+// })
 </script>
 
 <style scoped>
