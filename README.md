@@ -102,5 +102,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     1. 添加当是Point的时候，点一次关闭draw
     2. 添加可以打开draw
     3. 添加关闭layer的功能
+    4. 处理layer图层，销毁与创建
+    5. 处理source数据，销毁与创建
 
 ### 刚学真的是各种写错，写漏api的字母

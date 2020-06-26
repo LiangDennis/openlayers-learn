@@ -32,7 +32,7 @@ export default {
     this.map.on('click', (e) => {
       // console.log('地图被点击了')
       // console.log(e)
-      if (this.draw && this.selectType === 'Point') {
+      if (this.draw && this.selectType === 'Point') { // 防止画线、多边形、圆形的时候点击一次就消失
         this.map.removeInteraction(this.draw)
         this.map.removeInteraction(this.snap)
       }
@@ -47,8 +47,9 @@ export default {
   methods: {
     handleTypeChange () {
       if (!this.vectorLayer) {
-        this.vectorLayer = this.createLayer()
+        this.vectorLayer = this.createLayer() // 当创建的时候还是同一个source
         this.map.addLayer(this.vectorLayer)
+        this.createDrawSnap()
       }
       this.map.removeInteraction(this.draw) // 移除旧的draw和snap
       this.map.removeInteraction(this.snap)
@@ -118,6 +119,10 @@ export default {
       this.map.addInteraction(modify)
     },
     createDrawSnap () {
+      if (!this.vectorLayer) {
+        this.vectorLayer = this.createLayer()
+        this.map.addLayer(this.vectorLayer)
+      }
       let that = this
       this.draw = new ol.interaction.Draw({
         source: that.source,
@@ -143,9 +148,14 @@ export default {
       this.snap = new ol.interaction.Snap({source: that.source}) // 鼠标的自动吸附
       this.map.addInteraction(this.snap)
     },
+    // 清除图层
     removeLayerMethod () {
       // this.vectorLayer && this.map.removeLayer(this.vectorLayer)
       if (this.vectorLayer) {
+        // this.vectorLayer.clear() // 清除所有的feature
+        this.map.removeInteraction(this.draw)
+        this.map.removeInteraction(this.snap)
+        this.source.clear() // 清除所有的feature
         this.map.removeLayer(this.vectorLayer)
         this.vectorLayer = null
       }
