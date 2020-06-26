@@ -43,10 +43,6 @@ export default {
   methods: {
     // 改变 feature 类型
     handleTypeChange () {
-      if (!this.vectorLayer) {
-        this.resetLayer()
-        this.createDrawSnap()
-      }
       this.removeDrawSnap()
       this.createDrawSnap() // 创建新的draw和snap
     },
@@ -112,6 +108,7 @@ export default {
     },
     // 地图交互 draw 绘制各种图形 snap 鼠标吸附
     createDrawSnap () {
+      if (this.draw) return alert('draw 已经存在，无需创建')
       if (!this.vectorLayer) {
         this.resetLayer()
       }
@@ -141,6 +138,8 @@ export default {
     removeDrawSnap () {
       this.map.removeInteraction(this.draw)
       this.map.removeInteraction(this.snap)
+      this.draw = null // 在地图销毁draw和snap后，需要将draw和snap值设置为null，以便判断
+      this.snap = null
     },
     // 清除 layer 图层 以及 清除数据
     removeLayerMethod () {
