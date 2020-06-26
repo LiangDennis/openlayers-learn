@@ -98,4 +98,9 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
        2. 这种方式获取的feature是一个个的，而不是数组
        3. 如果地图点击上方有多个feature，那么就会一个一个的获取到所有的feature
 
+  #### 尝试一些新功能
+    1. 添加当是Point的时候，点一次关闭draw
+    2. 添加可以打开draw
+    3. 添加关闭layer的功能
+
 ### 刚学真的是各种写错，写漏api的字母
