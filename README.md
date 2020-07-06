@@ -106,3 +106,5 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     5. 处理source数据，销毁与创建
 
 ### 刚学真的是各种写错，写漏api的字母
+  1. 创建地图时，将layers写成layer时，不会加载地图
+  2. 通过Object.freeze冻结的地图无法显示
