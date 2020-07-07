@@ -3,6 +3,7 @@
   <h2>{{title}}</h2>
   <div class="map" id="map"></div>
   <div id="popup"><div class="popupStyle">Null Island</div></div>
+  <span>{{time}}</span>
 </div>
 </template>
 
@@ -14,7 +15,8 @@ export default {
   data () {
     return {
       title: 'openlayers overlay 拖动',
-      map: null
+      map: null,
+      time: 0
     }
   },
   mounted () {
@@ -25,10 +27,6 @@ export default {
       let element = document.getElementById('popup')
 
       let rasterLayer = new ol.layer.Tile({
-        // source: new ol.source.TileJSON({
-        //   url: 'https://api.tiles.mapbox.com/v3/mapbox.geography-class.json?secure',
-        //   crossOrigin: ''
-        // })
         source: new ol.source.OSM()
       })
 
@@ -74,11 +72,23 @@ export default {
       })
       this.map.on('pointerup', (evt) => {
         if (popup.get('dragging') === true) {
-          dragPan.setActive(false)
+          dragPan.setActive(true) // 为false时，地图不能拖动，此时拖动的只能是dragPan
           console.info('stop dragging')
           popup.set('dragging', false)
         }
       })
+
+      let timer = setInterval(() => {
+        this.time++
+        if (this.time >= 5) {
+          this.map.removeOverlay(popup)
+          console.log(dragPan.getActive())
+          this.time = 0
+          clearInterval(timer)
+          timer = null
+        }
+        console.log(dragPan.getActive())
+      }, 1000)
     }
   }
 }
