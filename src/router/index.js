@@ -36,6 +36,11 @@ export default new Router({
       path: '/ol05',
       name: 'ol05',
       component: () => import('@/components/ol-05')
+    },
+    {
+      path: '/ol06',
+      name: 'ol06',
+      component: () => import('@/components/ol-06')
     }
   ]
 })
