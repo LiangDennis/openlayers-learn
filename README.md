@@ -105,6 +105,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     4. 处理layer图层，销毁与创建
     5. 处理source数据，销毁与创建
 
+<<<<<<< HEAD
 ### 第三个openlayers 拖动效果 interaction.DragPan 以及overlay，实现overlay的拖动效果
   #### 创建overlay，同时设置属性stopEvent以及dragging，暂时不知道是不是自定义的属性还是地图本身的属性。
   #### 创建dragPan，属于地图交互组件interaction中的一个属性
@@ -114,6 +115,9 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     2. 监听地图的鼠标移动事件，通过获取到地图的pixel和coordinate，设置overlay的拖动位置。
     3. 监听地图的鼠标抬起事件，重置overlay元素是否可以拖动的效果。
     4. 思考：dragPan的setActive的作用是什么？
+=======
+### 使用01组件，聚合数据的经纬度，必须是数字的类型
+>>>>>>> cb51b2ff3543589dd915d43d99aeb58a0eccc6f4
 
 ### 刚学真的是各种写错，写漏api的字母
   1. 创建地图时，将layers写成layer时，不会加载地图

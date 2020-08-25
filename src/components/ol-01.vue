@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h2>{{title}}</h2>
-    <input type="number" v-model="distance" style="margin: 0 0 10px;"> <button @click="createMap()">重新渲染地图</button>
+    <input type="number" v-model="distance" style="margin: 0 0 10px;"> <button @click="createMap">重新渲染地图</button>
     <div class="map" id="map"></div>
   </div>
 </template>
@@ -9,38 +9,80 @@
 <script>
 import 'openlayers/dist/ol.css'
 import ol from 'openlayers'
+import axios from 'axios'
+
 export default {
   data () {
     return {
       title: 'openlayers 聚合features',
       distance: 10,
       styleCache: {},
-      map: null
+      map: null,
+      features: null
     }
   },
   mounted () {
-    this.createMap()
+    this.createAxiosData()
+    // this.createFeatureData()
+    // setTimeout(() => {
+    //   this.createMap()
+    // }, 1000)
 
     // this.onlyOneMethodToCreateMap()
   },
   methods: {
+    createAxiosData () {
+      let features = []
+      axios({
+        url: `http://192.168.201.180:7002/brain-core/RoadConstruction/getListMap?token=6d0de0b8-b0ee-491c-9bea-b61a0700766a`,
+        method: 'POST'
+      }).then(res => {
+        let list = res.data.obj
+        list.map(v => {
+          let coordinates = [Number(v.longitude), Number(v.latitude)] // 聚合的数据经纬度必须是数字
+          features.push(new ol.Feature(new ol.geom.Point(coordinates)))
+        })
+        this.features = features
+        console.log(this.features)
+      }).catch(e => {
+        console.log(e)
+      })
+    },
     // 创建 feature 数据
     createFeatureData () {
       let count = 20
-      let e = 4500000
+      // let e = 120
       let feature = new Array(count)
-      for (let i = 0; i < count; i++) {
-        // for 循环一个个创建feature
-        // Point 接收的数据是一个包含两个数值得数组，同时这两个数值是相对于[0, 0]点的位置距离
-        const coordinates = [2 * e * Math.random() - e, 2 * e * Math.random() - e]
-        // console.log(coordinates)
-        feature[i] = new ol.Feature(new ol.geom.Point(coordinates))
-      }
+      // for (let i = 0; i < count; i++) {
+      //   // for 循环一个个创建feature
+      //   // Point 接收的数据是一个包含两个数值得数组，同时这两个数值是相对于[0, 0]点的位置距离
+      //   const coordinates = [Math.abs(2 * e * Math.random() - e), Math.abs(2 * e * Math.random() - e)]
+      //   feature[i] = new ol.Feature(new ol.geom.Point(coordinates))
+      // }
+      feature = this.features
       return feature
+      // let features = []
+      // axios({
+      //   url: `http://192.168.201.180:7002/brain-core/RoadConstruction/getListMap?token=6d0de0b8-b0ee-491c-9bea-b61a0700766a`,
+      //   method: 'POST'
+      // }).then(res => {
+      //   let list = res.data.obj.slice(0, 20)
+      //   list.map(v => {
+      //     let coordinates = [v.longitude, v.latitude]
+      //     features.push(new ol.Feature(new ol.geom.Point(coordinates)))
+      //   })
+      //   this.features = features
+      //   // return features
+      //   // this.createMap()
+      // }).catch(e => {
+      //   console.log(e)
+      // })
     },
     // 创建 cluster 聚合数据
     createClusterData () {
+      // let features = this.features
       let features = this.createFeatureData()
+      console.log(features)
 
       let that = this
       let source = new ol.source.Vector({
@@ -85,16 +127,17 @@ export default {
     },
     // 创建地图
     createMap () {
-      if (this.map) {
-        // 1. 想删除原来的地图图层创建新的，这样的需求
-        // console.log(this.map.getLayers().a)
-        // this.map.removeLayer(this.map.getLayers().a[0])
-        // this.map.removeLayer(this.map.getLayers().a[0])
-        // 2. 现在的想法是将以前的feature删除，添加新的feature
-        console.log(this.map.getFeatures())
-      }
-
+      // if (this.map) {
+      //   // 1. 想删除原来的地图图层创建新的，这样的需求
+      //   // console.log(this.map.getLayers().a)
+      //   // this.map.removeLayer(this.map.getLayers().a[0])
+      //   // this.map.removeLayer(this.map.getLayers().a[0])
+      //   // 2. 现在的想法是将以前的feature删除，添加新的feature
+      //   console.log(this.map.getFeatures())
+      // }
       let clusters = this.createClusterData()
+
+      console.log(clusters.getSource())
 
       let raster = new ol.layer.Tile({
         source: new ol.source.OSM()
@@ -104,10 +147,10 @@ export default {
         layers: [raster, clusters],
         target: 'map',
         view: new ol.View({
-          // center: [121.3028308866, 31.0164689898],
-          // projection: 'EPSG:4326',
-          center: [0, 0],
-          zoom: 2
+          center: [121.3028308866, 31.0164689898],
+          projection: 'EPSG:4326',
+          // center: [0, 0],
+          zoom: 3
         })
       })
     },

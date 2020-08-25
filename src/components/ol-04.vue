@@ -8,7 +8,6 @@
 
 <script>
 import ol from 'openlayers'
-import 'openlayers/dist/ol.css'
 
 export default {
   data () {
@@ -39,6 +38,8 @@ export default {
           projection: 'EPSG:4326'
         })
       })
+
+      this.addPoint()
     },
     // 开启移动feature
     openDragFeature () {
@@ -65,6 +66,31 @@ export default {
       })
       this.map && this.map.addLayer(this.layer)
     },
+    addPoint () {
+      let style1 = new ol.style.Style({
+        image: new ol.style.Icon({
+          // src: `/static/logo.png`,
+          src: require('../images/logo.png'),
+          anchor: [0.5, 0.75]
+        }),
+        // zIndex: 3
+        zIndex: 6
+      })
+      let featureSource = new ol.source.Vector({})
+      // 添加inon
+      let feature = new ol.Feature({
+        type: 'icon',
+        geometry: new ol.geom.Point([104.06, 30.67])
+      })
+      feature.setStyle(style1)
+      featureSource.addFeature(feature)
+      let layer = new ol.layer.Vector({
+        zIndex: 11,
+        source: featureSource
+      })
+      this.map.addLayer(layer)
+    },
+    // ————————————————
     // 拖动feature
     dragFeature  (_map, _dragEndCallback) {
       console.log(_map)
